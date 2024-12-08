@@ -51,7 +51,18 @@ class HomeScreenViewModelTest {
     }
 
     @Test
-    fun market_summaryViewModel_failed_market_summary_retrieval() = runTest {
+    fun home_screen_ViewModel_empty_drugs_retrieval() = runTest {
+        coEvery { drugRepository.cachingDrugs() } returns Unit
+        coEvery { drugRepository.getDrugsFromDb() } returns emptyList()
+
+        homeViewModel.homeUiState.test {
+            assertEquals(HomeUiState.Loading, awaitItem())
+            assertEquals(HomeUiState.Success(emptyList()), awaitItem())
+        }
+    }
+
+    @Test
+    fun home_screen_ViewModel_failed_drugs_retrieval() = runTest {
         coEvery { drugRepository.cachingDrugs() } returns Unit
         coEvery { drugRepository.getDrugsFromDb() } throws Exception("Network error")
         coEvery { drugRepository.getDrugsFromRemote() } throws Exception("Network error")
